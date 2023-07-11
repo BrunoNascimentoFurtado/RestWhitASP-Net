@@ -1,8 +1,27 @@
+using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
+using RestWhitASP_Net.Model.Context;
+using RestWhitASP_Net.Service;
+using RestWhitASP_Net.Service.Implamantation;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+string MySqlConnection = builder.Configuration.GetConnectionString("MySQLConnection");
 
+builder.Services.AddDbContextPool<MySqlContex>(Options =>
+Options.UseMySql(MySqlConnection,
+ServerVersion.AutoDetect(MySqlConnection)));
+
+
+// Add services to the container.
 builder.Services.AddControllers();
+
+
+builder.Services.AddScoped<IPersonservice, PersonServiceImplamantation>(); // cada requisição é criada uma nova instancia
+// builder.Services.AddTransient(); // é instanciado apenas uma vez durante TODA a vida a aplicação (ex.: conexao com banco de dados)
+// builder.Services.AddSingleton(); // é instanciado um vez permanece instanciado durante a vida da sua requisição
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -23,3 +42,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
